@@ -256,7 +256,7 @@
             </div>
           </template>
 
-          <!-- PASO 2: FACTURA NEGRO/NARANJA -->
+          <!-- PASO 2: FACTURA -->
           <template v-if="step === 2">
             <div class="inv-head-bar">
               <span class="form-title">🧾 FACTURA</span>
@@ -447,6 +447,19 @@
           </div>
         </div>
       </div>
+    </transition>
+
+    <!-- ══ CARRITO FAB FLOTANTE ══ -->
+    <transition name="fab">
+      <button
+        v-if="cartCount() > 0"
+        class="cart-fab"
+        @click="showCart = true"
+      >
+        <span class="cart-fab-icon">🛒</span>
+        <span class="cart-fab-count">{{ cartCount() }}</span>
+        <span class="cart-fab-total">$ {{ formatPrice(cartTotal()) }}</span>
+      </button>
     </transition>
 
     <footer>
@@ -726,160 +739,173 @@ function clearHistory() {
 function buildPDF(orderData) {
   if (!jsPDFLib) { notify('PDF aún cargando, intenta de nuevo', 'error'); return null }
 
-  const doc = new jsPDFLib({ orientation: 'portrait', unit: 'mm', format: 'a5' })
+  // A4 para más espacio con letras grandes
+  const doc = new jsPDFLib({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = doc.internal.pageSize.getWidth()
+  const H = doc.internal.pageSize.getHeight()
+  const col1 = 14
+  const col2 = W / 2 + 4
   let y = 0
 
-  // Fondo negro total
+  // ── Fondo negro total ──
   doc.setFillColor(0, 0, 0)
-  doc.rect(0, 0, W, doc.internal.pageSize.getHeight(), 'F')
+  doc.rect(0, 0, W, H, 'F')
 
-  // Header naranja
+  // ── Header naranja ──
   doc.setFillColor(255, 107, 0)
-  doc.rect(0, 0, W, 28, 'F')
-
-  // Línea separadora amarilla-naranja
+  doc.rect(0, 0, W, 38, 'F')
   doc.setFillColor(255, 200, 0)
-  doc.rect(0, 28, W, 1.5, 'F')
+  doc.rect(0, 38, W, 2.5, 'F')
 
-  // Logo blanco sobre header naranja
+  // Logo
   doc.setTextColor(255, 255, 255)
-  doc.setFontSize(18)
+  doc.setFontSize(30)
   doc.setFont('helvetica', 'bold')
-  doc.text('SABOR PROHIBIDO', W / 2, 13, { align: 'center' })
-  doc.setFontSize(7)
-  doc.setTextColor(255, 220, 180)
-  doc.text('NIT: 900.123.456-7  |  San Gil, Santander  |  Tel: 3001234567', W / 2, 21, { align: 'center' })
+  doc.text('SABOR PROHIBIDO', W / 2, 20, { align: 'center' })
 
-  y = 36
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(255, 230, 200)
+  doc.text('NIT: 900.123.456-7  |  San Gil, Santander  |  Tel: 3001234567', W / 2, 31, { align: 'center' })
 
-  // Info factura sobre fondo negro
-  const col1 = 10, col2 = W / 2 + 2
+  y = 50
 
+  // ── Helper: campo etiqueta + valor ──
   const addField = (lbl, val, cx, cy) => {
     doc.setTextColor(255, 107, 0)
     doc.setFont('helvetica', 'normal')
-    doc.setFontSize(6.5)
+    doc.setFontSize(9)
     doc.text(lbl.toUpperCase(), cx, cy)
     doc.setTextColor(255, 255, 255)
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8)
-    doc.text(String(val), cx, cy + 5)
+    doc.setFontSize(13)
+    doc.text(String(val), cx, cy + 8)
   }
 
-  // Línea divisora fina naranja entre campos
-  doc.setDrawColor(255, 107, 0)
-  doc.setLineWidth(0.3)
-
+  // ── Sección de datos del cliente ──
   addField('Factura #', orderData.invNum, col1, y + 2)
   addField('Fecha', orderData.invDate, col2, y + 2)
-  addField('Cliente', `${orderData.nombre} ${orderData.apellido}`, col1, y + 14)
-  addField('Telefono', orderData.tel, col2, y + 14)
-  addField('Entrega', orderData.tipo === 'domicilio' ? 'A domicilio' : 'Recoger en local', col1, y + 23)
-  addField('Pago', getPagoLabelStatic(orderData.pago).replace(/[^\w\s]/gi, ''), col2, y + 23)
+  y += 20
 
-  y += 36
+  addField('Cliente', `${orderData.nombre} ${orderData.apellido}`, col1, y + 2)
+  addField('Teléfono', orderData.tel, col2, y + 2)
+  y += 20
+
+  addField('Entrega', orderData.tipo === 'domicilio' ? 'A domicilio' : 'Recoger en local', col1, y + 2)
+  addField('Pago', getPagoLabelStatic(orderData.pago).replace(/[^\w\s]/gi, ''), col2, y + 2)
+  y += 20
+
   if (orderData.tipo === 'domicilio' && orderData.dir) {
+    doc.setDrawColor(255, 107, 0)
+    doc.setLineWidth(0.4)
     doc.line(col1, y, W - col1, y)
-    y += 3
-    addField('Direccion', orderData.dir, col1, y + 2)
-    y += 14
+    y += 4
+    addField('Dirección', orderData.dir, col1, y + 2)
+    y += 18
   }
+
   if (orderData.nota) {
+    doc.setDrawColor(255, 107, 0)
+    doc.setLineWidth(0.4)
     doc.line(col1, y, W - col1, y)
-    y += 3
+    y += 4
     addField('Notas', orderData.nota, col1, y + 2)
-    y += 14
+    y += 18
   }
 
-  y += 4
-  // Tabla header naranja
-  doc.setFillColor(255, 107, 0)
-  doc.rect(0, y, W, 9, 'F')
-  doc.setTextColor(255, 255, 255)
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(7.5)
-  doc.text('PRODUCTO', col1, y + 6)
-  doc.text('CANT', W * 0.62, y + 6, { align: 'center' })
-  doc.text('PRECIO', W * 0.78, y + 6, { align: 'center' })
-  doc.text('TOTAL', W - 8, y + 6, { align: 'right' })
-  y += 11
-
-  // Filas alternadas: negro puro / negro con tinte naranja muy sutil
-  orderData.items.forEach((it, idx) => {
-    if (idx % 2 === 0) {
-      doc.setFillColor(20, 8, 0)
-      doc.rect(0, y - 1, W, 9, 'F')
-    }
-    doc.setTextColor(220, 220, 220)
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(7.5)
-    doc.text(`${it.name}`, col1, y + 5.5)
-    doc.text(String(it.qty), W * 0.62, y + 5.5, { align: 'center' })
-    doc.setFont('helvetica', 'normal')
-    doc.text(`$${formatPrice(it.price)}`, W * 0.78, y + 5.5, { align: 'center' })
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(255, 107, 0)
-    doc.text(`$${formatPrice(it.price * it.qty)}`, W - 8, y + 5.5, { align: 'right' })
-    y += 9
-  })
-
-  y += 4
-  // Línea divisora naranja
-  doc.setDrawColor(255, 107, 0)
-  doc.setLineWidth(0.5)
-  doc.line(col1, y, W - col1, y)
   y += 6
 
-  // Totales sobre negro
-  const addTotal = (lbl, val, highlight) => {
+  // ── Cabecera de tabla ──
+  doc.setFillColor(255, 107, 0)
+  doc.rect(0, y, W, 13, 'F')
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(11)
+  doc.text('PRODUCTO', col1, y + 9)
+  doc.text('CANT', W * 0.60, y + 9, { align: 'center' })
+  doc.text('PRECIO', W * 0.76, y + 9, { align: 'center' })
+  doc.text('TOTAL', W - col1, y + 9, { align: 'right' })
+  y += 15
+
+  // ── Filas de productos ──
+  const rowH = 13
+  orderData.items.forEach((it, idx) => {
+    if (idx % 2 === 0) {
+      doc.setFillColor(22, 8, 0)
+      doc.rect(0, y - 2, W, rowH, 'F')
+    }
+    doc.setTextColor(230, 230, 230)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(highlight ? 255 : 160, highlight ? 107 : 160, highlight ? 0 : 160)
-    doc.setFontSize(8)
-    doc.text(lbl, col1 + 2, y + 5)
+    doc.setFontSize(12)
+    // Truncar nombre largo
+    const maxName = 28
+    const nombre = it.name.length > maxName ? it.name.slice(0, maxName) + '…' : it.name
+    doc.text(nombre, col1, y + 7)
+    doc.text(String(it.qty), W * 0.60, y + 7, { align: 'center' })
+    doc.text(`$${formatPrice(it.price)}`, W * 0.76, y + 7, { align: 'center' })
     doc.setFont('helvetica', 'bold')
-    doc.setTextColor(highlight ? 255 : 200, highlight ? 107 : 200, highlight ? 0 : 200)
-    doc.text(val, W - 8, y + 5, { align: 'right' })
-    y += 7
+    doc.setTextColor(255, 107, 0)
+    doc.text(`$${formatPrice(it.price * it.qty)}`, W - col1, y + 7, { align: 'right' })
+    y += rowH
+  })
+
+  y += 6
+
+  // ── Línea divisora ──
+  doc.setDrawColor(255, 107, 0)
+  doc.setLineWidth(0.8)
+  doc.line(col1, y, W - col1, y)
+  y += 8
+
+  // ── Totales ──
+  const addTotal = (lbl, val, isGrand) => {
+    doc.setFont('helvetica', isGrand ? 'bold' : 'normal')
+    doc.setFontSize(isGrand ? 16 : 13)
+    doc.setTextColor(isGrand ? 255 : 150, isGrand ? 107 : 150, isGrand ? 0 : 150)
+    doc.text(lbl, col1 + 4, y + 6)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(isGrand ? 255 : 200, isGrand ? 107 : 200, isGrand ? 0 : 200)
+    doc.text(val, W - col1, y + 6, { align: 'right' })
+    y += isGrand ? 11 : 9
   }
 
   addTotal('Subtotal', `$${formatPrice(orderData.total)}`, false)
   addTotal('Domicilio', 'GRATIS', false)
   addTotal('IVA', '$0', false)
 
-  // Línea total naranja gruesa
+  // Línea total gruesa
   doc.setDrawColor(255, 107, 0)
-  doc.setLineWidth(1)
+  doc.setLineWidth(1.5)
   doc.line(col1, y, W - col1, y)
-  y += 4
+  y += 6
 
-  doc.setFontSize(11)
+  // Total grande
+  doc.setFontSize(20)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(255, 107, 0)
-  doc.text('TOTAL A PAGAR', col1 + 2, y + 6)
-  doc.setTextColor(255, 200, 0)
-  doc.text(`$${formatPrice(orderData.total)}`, W - 8, y + 6, { align: 'right' })
-  y += 14
+  doc.text('TOTAL A PAGAR', col1 + 4, y + 10)
+  doc.setTextColor(255, 210, 0)
+  doc.text(`$${formatPrice(orderData.total)}`, W - col1, y + 10, { align: 'right' })
+  y += 18
 
   if (orderData.pago === 'efectivo' && orderData.cambio) {
-    doc.setFontSize(8)
+    doc.setFontSize(13)
     doc.setFont('helvetica', 'normal')
-    doc.setTextColor(100, 220, 100)
+    doc.setTextColor(80, 220, 80)
     const cambio = Math.max(0, orderData.cambio - orderData.total)
-    doc.text(`Cambio estimado: $${formatPrice(cambio)}`, col1 + 2, y + 4)
-    y += 10
+    doc.text(`Cambio estimado: $${formatPrice(cambio)}`, col1 + 4, y + 6)
+    y += 12
   }
 
-  // Footer naranja
-  const pageH = doc.internal.pageSize.getHeight()
+  // ── Footer naranja ──
   doc.setFillColor(255, 107, 0)
-  doc.rect(0, pageH - 14, W, 14, 'F')
+  doc.rect(0, H - 20, W, 20, 'F')
   doc.setFillColor(255, 200, 0)
-  doc.rect(0, pageH - 15, W, 1.5, 'F')
+  doc.rect(0, H - 21.5, W, 2, 'F')
   doc.setTextColor(255, 255, 255)
-  doc.setFontSize(7)
+  doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
-  doc.text('GRACIAS POR TU PEDIDO! | SABOR PROHIBIDO | SAN GIL', W / 2, pageH - 6, { align: 'center' })
+  doc.text('GRACIAS POR TU PEDIDO!  |  SABOR PROHIBIDO  |  SAN GIL', W / 2, H - 8, { align: 'center' })
 
   return doc
 }
@@ -1130,13 +1156,12 @@ header {
 .cat-chip.active { color:#FFE600; border-bottom-color:#FFE600; }
 
 /* ══ PRODUCTOS ══ */
-.products-wrap { max-width:1400px; margin:0 auto; padding:20px 10px; background:#000; }
+.products-wrap { max-width:1400px; margin:0 auto; padding:20px 10px 100px; background:#000; }
 .sec-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
 .sec-title { font-family:'Anton',cursive; font-size:clamp(1.2rem, 4vw, 2rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; white-space:nowrap; }
 .stripe-line { flex:1; height:14px; background:repeating-linear-gradient(-45deg,#FFE600 0px,#FFE600 8px,#000 8px,#000 16px); border-radius:2px; max-width:200px; min-width:20px; }
 .count-pill { background:#FFE600; color:#000; font-family:'Anton',cursive; font-size:.8rem; letter-spacing:1px; padding:3px 10px; border-radius:4px; white-space:nowrap; }
 
-/* Grid: 2 columnas mínimo desde 300px */
 .product-grid {
   display:grid;
   grid-template-columns:repeat(2, 1fr);
@@ -1447,39 +1472,41 @@ header {
 }
 .btn-download:hover { background:#FFE600; color:#000; }
 
-/* ══ FACTURA NEGRO/NARANJA ══ */
+/* ══ FACTURA NEGRO/NARANJA — LETRAS MÁS GRANDES ══ */
 .invoice-wrap { padding:0 16px 16px; }
 .inv-head-bar { padding:16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #FFE600; background:#000; position:sticky; top:0; z-index:2; }
 
-/* Factura: fondo negro, acentos naranja */
 .invoice { background:#0a0a0a; color:#fff; border-radius:8px; overflow:hidden; margin-top:16px; border:1px solid #FF6B00; }
 .inv-top { background:#FF6B00; padding:16px 18px; text-align:center; border-bottom:3px solid #FFE000; }
-.inv-logo-text { font-family:'Permanent Marker',cursive; font-size:clamp(1.2rem, 5vw, 1.8rem); color:#fff; letter-spacing:2px; }
-.inv-sub { font-size:.7rem; color:rgba(255,255,255,.85); margin-top:4px; }
+.inv-logo-text { font-family:'Permanent Marker',cursive; font-size:clamp(1.3rem, 5vw, 2rem); color:#fff; letter-spacing:2px; }
+.inv-sub { font-size:.82rem; color:rgba(255,255,255,.9); margin-top:5px; font-weight:700; }
+
 .inv-meta { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:#FF6B00; border-bottom:1px solid #FF6B00; }
-.inv-cell { background:#111; padding:8px 12px; }
-.inv-cell label { display:block; font-size:.65rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; font-weight:700; margin-bottom:2px; }
-.inv-cell span { font-size:.82rem; font-weight:800; color:#fff; }
+.inv-cell { background:#111; padding:11px 14px; }
+.inv-cell label { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; font-weight:800; margin-bottom:4px; }
+.inv-cell span { font-size:1rem; font-weight:800; color:#fff; }
 .inv-cell.wide { grid-column:span 2; }
-.inv-table-wrap { padding:12px 14px; }
-.inv-table-wrap table { width:100%; border-collapse:collapse; font-size:.78rem; table-layout:fixed; }
-.inv-table-wrap th { text-align:left; padding:6px 4px; border-bottom:2px solid #FF6B00; font-size:.68rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; }
+
+.inv-table-wrap { padding:14px 16px; }
+.inv-table-wrap table { width:100%; border-collapse:collapse; font-size:.92rem; table-layout:fixed; }
+.inv-table-wrap th { text-align:left; padding:8px 5px; border-bottom:2px solid #FF6B00; font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; }
 .inv-table-wrap th:not(:first-child) { text-align:center; }
 .inv-table-wrap th:last-child { text-align:right; }
 .inv-table-wrap th:first-child { width:45%; }
 .inv-table-wrap th:nth-child(2) { width:12%; }
 .inv-table-wrap th:nth-child(3) { width:22%; }
 .inv-table-wrap th:nth-child(4) { width:21%; }
-.inv-table-wrap td { padding:6px 4px; border-bottom:1px solid #1e1e1e; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.inv-table-wrap td { padding:8px 5px; border-bottom:1px solid #1e1e1e; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .inv-table-wrap td:not(:first-child) { text-align:center; }
 .inv-table-wrap td:last-child { text-align:right; font-weight:800; color:#FF6B00; }
-.inv-totals { background:#0d0d0d; padding:10px 14px; border-top:1px solid #FF6B00; }
-.inv-tot { display:flex; justify-content:space-between; font-size:.82rem; color:#888; padding:3px 0; font-weight:600; }
-.inv-tot.grand { border-top:2px solid #FF6B00; margin-top:6px; padding-top:6px; font-size:clamp(.95rem, 3vw, 1.1rem); font-weight:900; color:#fff; }
+
+.inv-totals { background:#0d0d0d; padding:12px 16px; border-top:1px solid #FF6B00; }
+.inv-tot { display:flex; justify-content:space-between; font-size:.95rem; color:#999; padding:5px 0; font-weight:700; }
+.inv-tot.grand { border-top:2px solid #FF6B00; margin-top:8px; padding-top:8px; font-size:clamp(1.05rem, 3.5vw, 1.3rem); font-weight:900; color:#fff; }
 .inv-tot.grand span:last-child { color:#FF6B00; }
 .inv-gratis { color:#00e676; }
-.inv-cambio { color:#00e676; margin-top:4px; }
-.inv-foot-note { background:#FF6B00; color:#fff; text-align:center; padding:10px; font-size:.7rem; font-family:'Anton',cursive; letter-spacing:2px; }
+.inv-cambio { color:#00e676; margin-top:4px; font-size:1rem; }
+.inv-foot-note { background:#FF6B00; color:#fff; text-align:center; padding:12px; font-size:.8rem; font-family:'Anton',cursive; letter-spacing:2px; }
 
 /* ══ HISTORIAL ══ */
 .history-modal {
@@ -1509,6 +1536,63 @@ header {
 
 /* ══ PANEL ADMIN ══ */
 .product-preview { background:#111; border:1px dashed #333; border-radius:8px; padding:12px; margin-top:4px; }
+
+/* ══ CARRITO FAB FLOTANTE ══ */
+.cart-fab {
+  position:fixed;
+  bottom:24px;
+  right:16px;
+  z-index:150;
+  background:#FF6B00;
+  border:none;
+  border-radius:50px;
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  box-shadow:0 6px 24px rgba(255,107,0,.55), 0 2px 8px rgba(0,0,0,.6);
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  font-size:1.3rem;
+}
+.cart-fab:hover {
+  background:#FFE600;
+  transform:scale(1.07) translateY(-2px);
+  box-shadow:0 10px 32px rgba(255,230,0,.45), 0 4px 12px rgba(0,0,0,.6);
+}
+.cart-fab:active { transform:scale(0.97); }
+.cart-fab-icon { font-size:1.3rem; line-height:1; }
+.cart-fab-count {
+  background:#000;
+  color:#FFE600;
+  font-family:'Anton',cursive;
+  font-size:.88rem;
+  letter-spacing:1px;
+  border-radius:50%;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:all .2s;
+}
+.cart-fab-total {
+  font-family:'Anton',cursive;
+  font-size:1rem;
+  letter-spacing:1px;
+  color:#fff;
+  white-space:nowrap;
+  transition:all .2s;
+}
+.cart-fab:hover .cart-fab-count { background:#000; color:#FF6B00; }
+.cart-fab:hover .cart-fab-total { color:#000; }
+
+/* ══ TRANSICIÓN FAB ══ */
+.fab-enter-active { transition:all .35s cubic-bezier(.34,1.56,.64,1); }
+.fab-leave-active { transition:all .2s ease; }
+.fab-enter-from { opacity:0; transform:translateY(20px) scale(0.8); }
+.fab-leave-to   { opacity:0; transform:translateY(20px) scale(0.8); }
 
 /* ══ SPINNER ══ */
 .spinner-overlay { position:fixed; inset:0; background:rgba(0,0,0,.97); z-index:500; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; }
@@ -1551,17 +1635,14 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
 .notif-leave-to   { opacity:0; transform:translateX(60px); }
 
 /* ══ RESPONSIVE ══ */
-
-/* 480px — celular normal */
 @media(min-width:480px){
   .cart-label { display:inline; }
   .header-inner { padding:0 16px; height:66px; }
-  .products-wrap { padding:24px 14px; }
+  .products-wrap { padding:24px 14px 110px; }
   .product-grid { gap:12px; }
   .form-row { grid-template-columns:1fr 1fr; }
 }
 
-/* 600px — pantalla mediana */
 @media(min-width:600px){
   .header-inner { height:72px; }
   .logo-text { letter-spacing:2px; }
@@ -1569,21 +1650,19 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
   .card-name { font-size:.95rem; }
   .price { font-size:1.25rem; }
   .add-btn { width:34px; height:34px; }
+  .cart-fab { bottom:28px; right:24px; }
 }
 
-/* 900px — tablet */
 @media(min-width:900px){
   .product-grid { grid-template-columns:repeat(4, 1fr); gap:16px; }
 }
 
-/* 1200px — desktop */
 @media(min-width:1200px){
   .product-grid { grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); }
   .header-inner { padding:0 24px; }
-  .products-wrap { padding:32px 24px; }
+  .products-wrap { padding:32px 24px 120px; }
 }
 
-/* Pantallas muy pequeñas — 300-360px */
 @media(max-width:360px){
   .header-inner { gap:5px; padding:0 8px; }
   .menu-icon { font-size:1.2rem; }
@@ -1606,11 +1685,12 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
   .form-body { padding:12px 14px; }
   .form-actions { padding:0 14px 14px; gap:6px; }
   .btn-back, .btn-confirm, .btn-download { font-size:.78rem; padding:10px 6px; }
-  .inv-table-wrap table { font-size:.68rem; }
-  .inv-cell { padding:6px 8px; }
+  .inv-table-wrap table { font-size:.78rem; }
+  .inv-cell { padding:8px 10px; }
+  .cart-fab { bottom:16px; right:12px; padding:12px 14px; }
+  .cart-fab-total { display:none; }
 }
 
-/* Touch — evitar zoom en inputs iOS */
 @media(max-width:768px){
   .form-group input,
   .form-group textarea,
