@@ -965,6 +965,9 @@ function addProduct() {
 </script>
 
 <style scoped>
+/* ══ GOOGLE FONTS ══ */
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Anton&family=Nunito:wght@700;800;900&display=swap');
+
 /* ══ VARIABLES ══ */
 :root {
   --yellow:  #FFE600;
@@ -1010,10 +1013,12 @@ header {
 }
 .menu-icon { color:#FFE600; font-size:1.5rem; cursor:pointer; flex-shrink:0; }
 .logo-wrap { flex:1; display:flex; justify-content:center; overflow:hidden; }
+
+/* ══ CAMBIO PRINCIPAL: Black Han Sans en lugar de Permanent Marker ══ */
 .logo-text {
-  font-family:'Permanent Marker',cursive;
-  font-size:clamp(1.2rem, 4vw, 2.2rem);
-  letter-spacing:1px;
+  font-family:'Black Han Sans', sans-serif;
+  font-size:clamp(1.3rem, 4.5vw, 2.2rem);
+  letter-spacing:2px;
   background:linear-gradient(180deg,#FFD700 0%,#FF6B00 60%,#FF3300 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
@@ -1021,6 +1026,7 @@ header {
   text-transform:uppercase;
   white-space:nowrap;
 }
+
 .cart-btn {
   background:transparent;
   border:2px solid #FFE600;
@@ -1104,16 +1110,20 @@ header {
 .hero-stripe { position:absolute; left:0; right:0; height:10px; background:repeating-linear-gradient(-45deg,#FFE600 0px,#FFE600 8px,#000 8px,#000 16px); }
 .hero-stripe.top { top:0; }
 .hero-stripe.bot { bottom:0; }
+
+/* ══ CAMBIO PRINCIPAL: Black Han Sans en hero ══ */
 .hero h1 {
-  font-family:'Permanent Marker',cursive;
-  font-size:clamp(2rem, 10vw, 5.5rem);
+  font-family:'Black Han Sans', sans-serif;
+  font-size:clamp(2.8rem, 14vw, 6rem);
   background:linear-gradient(180deg,#FFD700 0%,#FF6B00 60%,#FF3300 100%);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   background-clip:text;
-  line-height:1;
+  line-height:1.05;
   margin-bottom:10px;
+  letter-spacing:3px;
 }
+
 .hero-sub { font-family:'Anton',cursive; font-size:clamp(.95rem, 3vw, 1.1rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
 .promo-tags { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px; }
 .promo-tag { background:#111; border:1px solid #222; border-radius:20px; padding:6px 12px; font-size:clamp(.78rem, 2.5vw, .88rem); color:#888; }
@@ -1149,10 +1159,11 @@ header {
 .stripe-line { flex:1; height:14px; background:repeating-linear-gradient(-45deg,#FFE600 0px,#FFE600 8px,#000 8px,#000 16px); border-radius:2px; max-width:200px; min-width:20px; }
 .count-pill { background:#FFE600; color:#000; font-family:'Anton',cursive; font-size:.85rem; letter-spacing:1px; padding:3px 10px; border-radius:4px; white-space:nowrap; }
 
+/* ══ CAMBIO PRINCIPAL: 3 columnas en móvil ══ */
 .product-grid {
   display:grid;
-  grid-template-columns:repeat(2, 1fr);
-  gap:10px;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
   margin-bottom:32px;
 }
 
@@ -1171,19 +1182,19 @@ header {
 .product-card:hover { transform:translateY(-3px); border-color:#FF6B00; box-shadow:0 0 0 1px #FF6B00,0 8px 24px rgba(255,107,0,.2); }
 .card-img-wrap { width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; background:#1a1a1a; position:relative; overflow:hidden; }
 .card-img { width:100%; height:100%; object-fit:cover; display:block; }
-.popular-badge { position:absolute; top:6px; right:6px; background:#FF6B00; color:#fff; font-family:'Anton',cursive; font-size:.68rem; letter-spacing:1px; padding:3px 8px; border-radius:4px; text-transform:uppercase; z-index:1; }
-.card-body { padding:10px 10px 12px; }
-.card-name { font-family:'Anton',cursive; font-size:clamp(.92rem, 3vw, 1.05rem); letter-spacing:1px; color:#FF6B00; text-transform:uppercase; margin-bottom:4px; line-height:1.2; }
-.card-desc { font-size:clamp(.82rem, 2.2vw, .88rem); color:#666; line-height:1.35; margin-bottom:9px; min-height:32px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.card-footer { display:flex; align-items:center; justify-content:space-between; gap:4px; flex-wrap:nowrap; }
-.price { font-family:'Anton',cursive; font-size:clamp(1.1rem, 3.5vw, 1.35rem); letter-spacing:1px; color:#FFE600; flex-shrink:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; }
+.popular-badge { position:absolute; top:4px; right:4px; background:#FF6B00; color:#fff; font-family:'Anton',cursive; font-size:.6rem; letter-spacing:1px; padding:2px 6px; border-radius:4px; text-transform:uppercase; z-index:1; }
+.card-body { padding:7px 8px 10px; }
+.card-name { font-family:'Anton',cursive; font-size:clamp(.78rem, 2.5vw, 1rem); letter-spacing:.5px; color:#FF6B00; text-transform:uppercase; margin-bottom:3px; line-height:1.2; }
+.card-desc { font-size:clamp(.72rem, 2vw, .82rem); color:#666; line-height:1.3; margin-bottom:7px; min-height:28px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.card-footer { display:flex; align-items:center; justify-content:space-between; gap:3px; flex-wrap:nowrap; }
+.price { font-family:'Anton',cursive; font-size:clamp(.9rem, 3vw, 1.2rem); letter-spacing:.5px; color:#FFE600; flex-shrink:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:58%; }
 .add-btn {
   background:#FFE600;
   border:none;
-  border-radius:7px;
-  width:36px;
-  height:36px;
-  font-size:1.4rem;
+  border-radius:6px;
+  width:30px;
+  height:30px;
+  font-size:1.3rem;
   font-weight:900;
   cursor:pointer;
   display:flex;
@@ -1195,16 +1206,16 @@ header {
   line-height:1;
 }
 .add-btn:hover { background:#FF6B00; color:#fff; transform:scale(1.1); }
-.qty-control { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.qty-control { display:flex; align-items:center; gap:3px; flex-shrink:0; }
 .qty-btn {
   background:transparent;
   border:2px solid #FFE600;
   border-radius:5px;
-  width:30px;
-  height:30px;
+  width:26px;
+  height:26px;
   cursor:pointer;
   color:#FFE600;
-  font-size:1rem;
+  font-size:.9rem;
   font-weight:900;
   display:flex;
   align-items:center;
@@ -1214,7 +1225,7 @@ header {
   flex-shrink:0;
 }
 .qty-btn:hover { background:#FFE600; color:#000; }
-.qty-num { font-family:'Anton',cursive; font-size:1rem; letter-spacing:1px; color:#FFE600; min-width:18px; text-align:center; }
+.qty-num { font-family:'Anton',cursive; font-size:.9rem; letter-spacing:1px; color:#FFE600; min-width:16px; text-align:center; }
 
 /* ══ MODAL DETALLE ══ */
 .modal-overlay {
@@ -1465,7 +1476,10 @@ header {
 
 .invoice { background:#0a0a0a; color:#fff; border-radius:8px; overflow:hidden; margin-top:16px; border:1px solid #FF6B00; }
 .inv-top { background:#FF6B00; padding:16px 18px; text-align:center; border-bottom:3px solid #FFE000; }
-.inv-logo-text { font-family:'Permanent Marker',cursive; font-size:clamp(1.3rem, 5vw, 2rem); color:#fff; letter-spacing:2px; }
+
+/* ══ CAMBIO: Black Han Sans en factura ══ */
+.inv-logo-text { font-family:'Black Han Sans', sans-serif; font-size:clamp(1.3rem, 5vw, 2rem); color:#fff; letter-spacing:3px; }
+
 .inv-sub { font-size:.88rem; color:rgba(255,255,255,.9); margin-top:5px; font-weight:700; }
 
 .inv-meta { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:#FF6B00; border-bottom:1px solid #FF6B00; }
@@ -1609,7 +1623,18 @@ header {
 
 /* ══ FOOTER ══ */
 footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-align:center; }
-.footer-logo { font-family:'Permanent Marker',cursive; font-size:clamp(1.1rem, 4vw, 1.6rem); background:linear-gradient(180deg,#FFD700 0%,#FF6B00 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; }
+
+/* ══ CAMBIO PRINCIPAL: Black Han Sans en footer ══ */
+.footer-logo {
+  font-family:'Black Han Sans', sans-serif;
+  font-size:clamp(1.2rem, 4vw, 1.8rem);
+  letter-spacing:3px;
+  background:linear-gradient(180deg,#FFD700 0%,#FF6B00 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:6px;
+}
 .footer-info { color:#444; font-size:.85rem; font-weight:700; }
 
 /* ══ TRANSICIONES ══ */
@@ -1632,7 +1657,6 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
 
 @media(min-width:600px){
   .header-inner { height:72px; }
-  .logo-text { letter-spacing:2px; }
   .product-grid { grid-template-columns:repeat(3, 1fr); gap:14px; }
   .card-name { font-size:.95rem; }
   .price { font-size:1.25rem; }
@@ -1650,21 +1674,21 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
   .products-wrap { padding:32px 24px 120px; }
 }
 
-/* ══ PANTALLAS MUY PEQUEÑAS — menos agresivo con la reducción ══ */
+/* ══ PANTALLAS MUY PEQUEÑAS ══ */
 @media(max-width:360px){
   .header-inner { gap:5px; padding:0 8px; }
   .menu-icon { font-size:1.3rem; }
   .logo-text { font-size:1.1rem; }
   .cart-btn { padding:6px 8px; font-size:.82rem; }
   .history-btn { padding:6px 8px; }
-  .product-grid { grid-template-columns:repeat(2, 1fr); gap:8px; }
-  .card-body { padding:7px 8px 10px; }
-  .card-name { font-size:.82rem; }
-  .card-desc { font-size:.74rem; min-height:28px; }
-  .price { font-size:1rem; }
-  .add-btn { width:32px; height:32px; font-size:1.2rem; }
-  .qty-btn { width:26px; height:26px; font-size:.9rem; }
-  .qty-num { font-size:.88rem; min-width:16px; }
+  .product-grid { grid-template-columns:repeat(3, 1fr); gap:6px; }
+  .card-body { padding:5px 6px 8px; }
+  .card-name { font-size:.72rem; }
+  .card-desc { font-size:.68rem; min-height:24px; }
+  .price { font-size:.85rem; }
+  .add-btn { width:26px; height:26px; font-size:1.1rem; }
+  .qty-btn { width:22px; height:22px; font-size:.8rem; }
+  .qty-num { font-size:.8rem; min-width:14px; }
   .promo-tag { font-size:.72rem; padding:5px 9px; }
   .cat-chip { padding:11px 11px; font-size:.78rem; }
   .sec-title { font-size:1.15rem; }
