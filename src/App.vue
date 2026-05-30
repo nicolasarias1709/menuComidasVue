@@ -157,7 +157,7 @@
           <div v-if="!cart.length" class="cart-empty">
             <div class="ee">🍽️</div>
             <p>CARRITO VACÍO</p>
-            <p style="font-size:.78rem;margin-top:8px;font-family:Nunito;color:#444;font-weight:700">¡Agrega algo delicioso!</p>
+            <p style="font-size:.9rem;margin-top:8px;font-family:Nunito;color:#444;font-weight:700">¡Agrega algo delicioso!</p>
           </div>
           <div v-for="item in cart" :key="item.id" class="cart-item">
             <span class="ci-emoji">{{ item.emoji }}</span>
@@ -165,9 +165,9 @@
               <div class="ci-name">{{ item.name }}</div>
               <div class="ci-bottom">
                 <div class="qty-control">
-                  <button class="qty-btn" style="width:26px;height:26px" @click="decrease(item.id)">−</button>
-                  <span class="qty-num" style="font-size:.9rem">{{ item.qty }}</span>
-                  <button class="qty-btn" style="width:26px;height:26px" @click="increase(item)">+</button>
+                  <button class="qty-btn" style="width:30px;height:30px" @click="decrease(item.id)">−</button>
+                  <span class="qty-num" style="font-size:1rem">{{ item.qty }}</span>
+                  <button class="qty-btn" style="width:30px;height:30px" @click="increase(item)">+</button>
                 </div>
                 <span class="ci-total">$ {{ formatPrice(item.price * item.qty) }}</span>
               </div>
@@ -427,15 +427,15 @@
             </div>
             <div class="form-group" style="display:flex;align-items:center;gap:12px">
               <input type="checkbox" v-model="newP.popular" id="popular-check" style="width:18px;height:18px;accent-color:#FF6B00;cursor:pointer">
-              <label for="popular-check" style="margin:0;cursor:pointer;font-size:.85rem;color:#aaa">Marcar como 🔥 POPULAR</label>
+              <label for="popular-check" style="margin:0;cursor:pointer;font-size:.95rem;color:#aaa">Marcar como 🔥 POPULAR</label>
             </div>
             <div v-if="newP.name || newP.emoji || newP.price" class="product-preview">
-              <div style="font-size:.7rem;color:#555;font-family:Anton,cursive;letter-spacing:1px;margin-bottom:8px">VISTA PREVIA</div>
+              <div style="font-size:.75rem;color:#555;font-family:Anton,cursive;letter-spacing:1px;margin-bottom:8px">VISTA PREVIA</div>
               <div style="display:flex;align-items:center;gap:12px;background:#1a1a1a;border-radius:8px;padding:10px 14px">
                 <span style="font-size:2rem">{{ newP.emoji || '❓' }}</span>
                 <div>
-                  <div style="font-family:Anton,cursive;color:#FF6B00;font-size:.95rem;letter-spacing:1px">{{ newP.name || 'Nombre del producto' }}</div>
-                  <div style="color:#888;font-size:.75rem">{{ newP.desc || 'Descripción...' }}</div>
+                  <div style="font-family:Anton,cursive;color:#FF6B00;font-size:1rem;letter-spacing:1px">{{ newP.name || 'Nombre del producto' }}</div>
+                  <div style="color:#888;font-size:.82rem">{{ newP.desc || 'Descripción...' }}</div>
                   <div style="font-family:Anton,cursive;color:#FFE600;font-size:1.1rem">$ {{ formatPrice(newP.price || 0) }}</div>
                 </div>
               </div>
@@ -449,7 +449,7 @@
       </div>
     </transition>
 
-    <!-- ══ CARRITO FAB FLOTANTE ══ -->
+    <!-- CARRITO FAB FLOTANTE -->
     <transition name="fab">
       <button
         v-if="cartCount() > 0"
@@ -739,7 +739,6 @@ function clearHistory() {
 function buildPDF(orderData) {
   if (!jsPDFLib) { notify('PDF aún cargando, intenta de nuevo', 'error'); return null }
 
-  // A4 para más espacio con letras grandes
   const doc = new jsPDFLib({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = doc.internal.pageSize.getWidth()
   const H = doc.internal.pageSize.getHeight()
@@ -747,17 +746,14 @@ function buildPDF(orderData) {
   const col2 = W / 2 + 4
   let y = 0
 
-  // ── Fondo negro total ──
   doc.setFillColor(0, 0, 0)
   doc.rect(0, 0, W, H, 'F')
 
-  // ── Header naranja ──
   doc.setFillColor(255, 107, 0)
   doc.rect(0, 0, W, 38, 'F')
   doc.setFillColor(255, 200, 0)
   doc.rect(0, 38, W, 2.5, 'F')
 
-  // Logo
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(30)
   doc.setFont('helvetica', 'bold')
@@ -770,7 +766,6 @@ function buildPDF(orderData) {
 
   y = 50
 
-  // ── Helper: campo etiqueta + valor ──
   const addField = (lbl, val, cx, cy) => {
     doc.setTextColor(255, 107, 0)
     doc.setFont('helvetica', 'normal')
@@ -782,7 +777,6 @@ function buildPDF(orderData) {
     doc.text(String(val), cx, cy + 8)
   }
 
-  // ── Sección de datos del cliente ──
   addField('Factura #', orderData.invNum, col1, y + 2)
   addField('Fecha', orderData.invDate, col2, y + 2)
   y += 20
@@ -815,7 +809,6 @@ function buildPDF(orderData) {
 
   y += 6
 
-  // ── Cabecera de tabla ──
   doc.setFillColor(255, 107, 0)
   doc.rect(0, y, W, 13, 'F')
   doc.setTextColor(255, 255, 255)
@@ -827,7 +820,6 @@ function buildPDF(orderData) {
   doc.text('TOTAL', W - col1, y + 9, { align: 'right' })
   y += 15
 
-  // ── Filas de productos ──
   const rowH = 13
   orderData.items.forEach((it, idx) => {
     if (idx % 2 === 0) {
@@ -837,7 +829,6 @@ function buildPDF(orderData) {
     doc.setTextColor(230, 230, 230)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(12)
-    // Truncar nombre largo
     const maxName = 28
     const nombre = it.name.length > maxName ? it.name.slice(0, maxName) + '…' : it.name
     doc.text(nombre, col1, y + 7)
@@ -851,13 +842,11 @@ function buildPDF(orderData) {
 
   y += 6
 
-  // ── Línea divisora ──
   doc.setDrawColor(255, 107, 0)
   doc.setLineWidth(0.8)
   doc.line(col1, y, W - col1, y)
   y += 8
 
-  // ── Totales ──
   const addTotal = (lbl, val, isGrand) => {
     doc.setFont('helvetica', isGrand ? 'bold' : 'normal')
     doc.setFontSize(isGrand ? 16 : 13)
@@ -873,13 +862,11 @@ function buildPDF(orderData) {
   addTotal('Domicilio', 'GRATIS', false)
   addTotal('IVA', '$0', false)
 
-  // Línea total gruesa
   doc.setDrawColor(255, 107, 0)
   doc.setLineWidth(1.5)
   doc.line(col1, y, W - col1, y)
   y += 6
 
-  // Total grande
   doc.setFontSize(20)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(255, 107, 0)
@@ -897,7 +884,6 @@ function buildPDF(orderData) {
     y += 12
   }
 
-  // ── Footer naranja ──
   doc.setFillColor(255, 107, 0)
   doc.rect(0, H - 20, W, 20, 'F')
   doc.setFillColor(255, 200, 0)
@@ -998,6 +984,7 @@ function addProduct() {
   min-height:100vh;
   color:#ffffff;
   font-family:'Nunito',sans-serif;
+  font-size:16px;
   min-width:300px;
   overflow-x:hidden;
 }
@@ -1021,7 +1008,7 @@ header {
   align-items:center;
   gap:8px;
 }
-.menu-icon { color:#FFE600; font-size:1.4rem; cursor:pointer; flex-shrink:0; }
+.menu-icon { color:#FFE600; font-size:1.5rem; cursor:pointer; flex-shrink:0; }
 .logo-wrap { flex:1; display:flex; justify-content:center; overflow:hidden; }
 .logo-text {
   font-family:'Permanent Marker',cursive;
@@ -1038,10 +1025,10 @@ header {
   background:transparent;
   border:2px solid #FFE600;
   border-radius:8px;
-  padding:6px 10px;
+  padding:7px 11px;
   color:#FFE600;
   font-family:'Anton',cursive;
-  font-size:.82rem;
+  font-size:.9rem;
   letter-spacing:1px;
   cursor:pointer;
   display:flex;
@@ -1056,9 +1043,9 @@ header {
   background:#FF6B00;
   color:#fff;
   border-radius:50%;
-  width:20px;
-  height:20px;
-  font-size:.72rem;
+  width:22px;
+  height:22px;
+  font-size:.78rem;
   font-weight:900;
   display:flex;
   align-items:center;
@@ -1068,9 +1055,9 @@ header {
   background:transparent;
   border:2px solid #333;
   border-radius:8px;
-  padding:6px 10px;
+  padding:7px 11px;
   color:#888;
-  font-size:.85rem;
+  font-size:.9rem;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -1083,9 +1070,9 @@ header {
   background:#333;
   color:#aaa;
   border-radius:50%;
-  width:18px;
-  height:18px;
-  font-size:.68rem;
+  width:20px;
+  height:20px;
+  font-size:.72rem;
   font-weight:900;
   display:flex;
   align-items:center;
@@ -1101,16 +1088,16 @@ header {
   background:#111;
   border:2px solid #222;
   border-radius:8px;
-  padding:10px 14px 10px 40px;
+  padding:11px 14px 11px 42px;
   color:#fff;
   font-family:'Nunito',sans-serif;
-  font-size:.9rem;
+  font-size:1rem;
   outline:none;
   transition:all .25s;
 }
 .search-inner input:focus { border-color:#FFE600; background:#0d0d0d; }
 .search-inner input::placeholder { color:#444; }
-.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:1rem; }
+.search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:1.1rem; }
 
 /* ══ HERO ══ */
 .hero { background:#000; padding:36px 12px; text-align:center; position:relative; overflow:hidden; }
@@ -1127,9 +1114,9 @@ header {
   line-height:1;
   margin-bottom:10px;
 }
-.hero-sub { font-family:'Anton',cursive; font-size:clamp(.8rem, 2.5vw, 1.1rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
+.hero-sub { font-family:'Anton',cursive; font-size:clamp(.95rem, 3vw, 1.1rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
 .promo-tags { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-top:14px; }
-.promo-tag { background:#111; border:1px solid #222; border-radius:20px; padding:5px 10px; font-size:clamp(.65rem, 2vw, .82rem); color:#888; }
+.promo-tag { background:#111; border:1px solid #222; border-radius:20px; padding:6px 12px; font-size:clamp(.78rem, 2.5vw, .88rem); color:#888; }
 .promo-tag.hot { border-color:#FF6B00; color:#FF6B00; }
 .promo-tag.spicy { border-color:#E63946; color:#E63946; }
 
@@ -1138,9 +1125,9 @@ header {
 .cat-scroll { max-width:1400px; margin:0 auto; display:flex; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
 .cat-scroll::-webkit-scrollbar { display:none; }
 .cat-chip {
-  padding:12px 14px;
+  padding:13px 16px;
   font-family:'Anton',cursive;
-  font-size:clamp(.72rem, 2vw, .85rem);
+  font-size:clamp(.82rem, 2.5vw, .92rem);
   letter-spacing:1px;
   color:#555;
   cursor:pointer;
@@ -1160,7 +1147,7 @@ header {
 .sec-head { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
 .sec-title { font-family:'Anton',cursive; font-size:clamp(1.2rem, 4vw, 2rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; white-space:nowrap; }
 .stripe-line { flex:1; height:14px; background:repeating-linear-gradient(-45deg,#FFE600 0px,#FFE600 8px,#000 8px,#000 16px); border-radius:2px; max-width:200px; min-width:20px; }
-.count-pill { background:#FFE600; color:#000; font-family:'Anton',cursive; font-size:.8rem; letter-spacing:1px; padding:3px 10px; border-radius:4px; white-space:nowrap; }
+.count-pill { background:#FFE600; color:#000; font-family:'Anton',cursive; font-size:.85rem; letter-spacing:1px; padding:3px 10px; border-radius:4px; white-space:nowrap; }
 
 .product-grid {
   display:grid;
@@ -1184,19 +1171,19 @@ header {
 .product-card:hover { transform:translateY(-3px); border-color:#FF6B00; box-shadow:0 0 0 1px #FF6B00,0 8px 24px rgba(255,107,0,.2); }
 .card-img-wrap { width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; background:#1a1a1a; position:relative; overflow:hidden; }
 .card-img { width:100%; height:100%; object-fit:cover; display:block; }
-.popular-badge { position:absolute; top:6px; right:6px; background:#FF6B00; color:#fff; font-family:'Anton',cursive; font-size:.6rem; letter-spacing:1px; padding:2px 7px; border-radius:4px; text-transform:uppercase; z-index:1; }
-.card-body { padding:8px 10px 10px; }
-.card-name { font-family:'Anton',cursive; font-size:clamp(.78rem, 2.5vw, 1rem); letter-spacing:1px; color:#FF6B00; text-transform:uppercase; margin-bottom:3px; line-height:1.2; }
-.card-desc { font-size:clamp(.68rem, 1.8vw, .78rem); color:#666; line-height:1.3; margin-bottom:8px; min-height:28px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.popular-badge { position:absolute; top:6px; right:6px; background:#FF6B00; color:#fff; font-family:'Anton',cursive; font-size:.68rem; letter-spacing:1px; padding:3px 8px; border-radius:4px; text-transform:uppercase; z-index:1; }
+.card-body { padding:10px 10px 12px; }
+.card-name { font-family:'Anton',cursive; font-size:clamp(.92rem, 3vw, 1.05rem); letter-spacing:1px; color:#FF6B00; text-transform:uppercase; margin-bottom:4px; line-height:1.2; }
+.card-desc { font-size:clamp(.82rem, 2.2vw, .88rem); color:#666; line-height:1.35; margin-bottom:9px; min-height:32px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .card-footer { display:flex; align-items:center; justify-content:space-between; gap:4px; flex-wrap:nowrap; }
-.price { font-family:'Anton',cursive; font-size:clamp(1rem, 3vw, 1.35rem); letter-spacing:1px; color:#FFE600; flex-shrink:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; }
+.price { font-family:'Anton',cursive; font-size:clamp(1.1rem, 3.5vw, 1.35rem); letter-spacing:1px; color:#FFE600; flex-shrink:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:55%; }
 .add-btn {
   background:#FFE600;
   border:none;
   border-radius:7px;
-  width:32px;
-  height:32px;
-  font-size:1.3rem;
+  width:36px;
+  height:36px;
+  font-size:1.4rem;
   font-weight:900;
   cursor:pointer;
   display:flex;
@@ -1213,11 +1200,11 @@ header {
   background:transparent;
   border:2px solid #FFE600;
   border-radius:5px;
-  width:26px;
-  height:26px;
+  width:30px;
+  height:30px;
   cursor:pointer;
   color:#FFE600;
-  font-size:.9rem;
+  font-size:1rem;
   font-weight:900;
   display:flex;
   align-items:center;
@@ -1227,7 +1214,7 @@ header {
   flex-shrink:0;
 }
 .qty-btn:hover { background:#FFE600; color:#000; }
-.qty-num { font-family:'Anton',cursive; font-size:.9rem; letter-spacing:1px; color:#FFE600; min-width:16px; text-align:center; }
+.qty-num { font-family:'Anton',cursive; font-size:1rem; letter-spacing:1px; color:#FFE600; min-width:18px; text-align:center; }
 
 /* ══ MODAL DETALLE ══ */
 .modal-overlay {
@@ -1260,10 +1247,10 @@ header {
   background:rgba(0,0,0,.7);
   border:2px solid #FFE600;
   border-radius:6px;
-  width:32px;
-  height:32px;
+  width:34px;
+  height:34px;
   color:#FFE600;
-  font-size:.95rem;
+  font-size:1rem;
   font-weight:900;
   cursor:pointer;
   display:flex;
@@ -1275,19 +1262,19 @@ header {
 .detail-close:hover { background:#E63946; border-color:#E63946; color:#fff; }
 .detail-img-wrap { width:100%; aspect-ratio:4/3; background:#1a1a1a; overflow:hidden; display:flex; align-items:center; justify-content:center; }
 .detail-img { width:100%; height:100%; object-fit:cover; display:block; }
-.detail-body { padding:16px 18px 20px; }
+.detail-body { padding:18px 20px 22px; }
 .detail-name { font-family:'Anton',cursive; font-size:clamp(1.2rem, 4vw, 1.8rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; margin-bottom:8px; }
-.detail-desc { color:#aaa; font-size:.9rem; line-height:1.5; margin-bottom:16px; }
+.detail-desc { color:#aaa; font-size:1rem; line-height:1.55; margin-bottom:16px; }
 .detail-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
 .detail-price { font-family:'Anton',cursive; font-size:clamp(1.4rem, 5vw, 2.2rem); letter-spacing:2px; color:#FFE600; }
 .detail-add {
   background:#FF6B00;
   border:none;
   border-radius:8px;
-  padding:10px 16px;
+  padding:11px 18px;
   color:#fff;
   font-family:'Anton',cursive;
-  font-size:.85rem;
+  font-size:.95rem;
   letter-spacing:1px;
   cursor:pointer;
   transition:all .2s;
@@ -1312,16 +1299,16 @@ header {
   animation:slideIn .3s ease;
 }
 @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
-.cart-head { padding:14px 16px; border-bottom:2px solid #FFE600; display:flex; align-items:center; justify-content:space-between; background:#000; flex-shrink:0; }
-.cart-head h2 { font-family:'Anton',cursive; font-size:clamp(1.1rem, 4vw, 1.6rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
+.cart-head { padding:16px 18px; border-bottom:2px solid #FFE600; display:flex; align-items:center; justify-content:space-between; background:#000; flex-shrink:0; }
+.cart-head h2 { font-family:'Anton',cursive; font-size:clamp(1.2rem, 4vw, 1.6rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
 .close-x {
   background:transparent;
   border:2px solid #333;
   border-radius:6px;
-  width:32px;
-  height:32px;
+  width:34px;
+  height:34px;
   color:#aaa;
-  font-size:1rem;
+  font-size:1.1rem;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -1334,28 +1321,28 @@ header {
 .cart-items { flex:1; overflow-y:auto; padding:12px; scrollbar-width:thin; scrollbar-color:#FFE600 transparent; }
 .cart-empty { text-align:center; padding:48px 16px; }
 .cart-empty .ee { font-size:3.5rem; margin-bottom:12px; }
-.cart-empty p { font-family:'Anton',cursive; font-size:1.1rem; letter-spacing:2px; color:#444; }
-.cart-item { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.ci-emoji { font-size:1.8rem; flex-shrink:0; }
+.cart-empty p { font-family:'Anton',cursive; font-size:1.15rem; letter-spacing:2px; color:#444; }
+.cart-item { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:11px; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.ci-emoji { font-size:2rem; flex-shrink:0; }
 .ci-info { flex:1; min-width:0; }
-.ci-name { font-family:'Anton',cursive; font-size:.82rem; letter-spacing:1px; color:#FF6B00; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:5px; }
+.ci-name { font-family:'Anton',cursive; font-size:.92rem; letter-spacing:1px; color:#FF6B00; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:6px; }
 .ci-bottom { display:flex; align-items:center; justify-content:space-between; gap:6px; }
-.ci-total { font-family:'Anton',cursive; font-size:.95rem; letter-spacing:1px; color:#FFE600; }
-.ci-del { background:none; border:none; color:#333; cursor:pointer; font-size:1rem; padding:4px; border-radius:4px; transition:color .2s; flex-shrink:0; }
+.ci-total { font-family:'Anton',cursive; font-size:1.05rem; letter-spacing:1px; color:#FFE600; }
+.ci-del { background:none; border:none; color:#333; cursor:pointer; font-size:1.1rem; padding:4px; border-radius:4px; transition:color .2s; flex-shrink:0; }
 .ci-del:hover { color:#E63946; }
 .cart-summary { padding:14px 16px; border-top:2px solid #FFE600; background:#000; flex-shrink:0; }
-.sum-row { display:flex; justify-content:space-between; font-size:.85rem; color:#555; margin-bottom:6px; font-weight:700; }
-.sum-row.total { font-family:'Anton',cursive; font-size:clamp(1.1rem, 3.5vw, 1.4rem); letter-spacing:2px; color:#fff; border-top:1px solid #1a1a1a; padding-top:8px; margin-top:4px; }
+.sum-row { display:flex; justify-content:space-between; font-size:.95rem; color:#555; margin-bottom:6px; font-weight:700; }
+.sum-row.total { font-family:'Anton',cursive; font-size:clamp(1.15rem, 3.5vw, 1.4rem); letter-spacing:2px; color:#fff; border-top:1px solid #1a1a1a; padding-top:8px; margin-top:4px; }
 .sum-row.total span:last-child { color:#FFE600; }
 .checkout-btn {
   width:100%;
   background:#FF6B00;
   border:none;
   border-radius:10px;
-  padding:13px;
+  padding:14px;
   color:#fff;
   font-family:'Anton',cursive;
-  font-size:clamp(.9rem, 3vw, 1.1rem);
+  font-size:clamp(1rem, 3vw, 1.1rem);
   letter-spacing:2px;
   cursor:pointer;
   margin-top:12px;
@@ -1390,9 +1377,9 @@ header {
   z-index:2;
 }
 .form-title { font-family:'Anton',cursive; font-size:clamp(1.1rem, 4vw, 1.6rem); letter-spacing:2px; color:#FFE600; text-transform:uppercase; }
-.form-body { padding:16px 18px; }
-.form-group { margin-bottom:14px; }
-.form-group label { display:block; font-family:'Anton',cursive; font-size:.75rem; letter-spacing:1.5px; color:#555; text-transform:uppercase; margin-bottom:6px; }
+.form-body { padding:18px 20px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-family:'Anton',cursive; font-size:.82rem; letter-spacing:1.5px; color:#555; text-transform:uppercase; margin-bottom:7px; }
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -1400,10 +1387,10 @@ header {
   background:#111;
   border:2px solid #222;
   border-radius:8px;
-  padding:10px 12px;
+  padding:12px 14px;
   color:#fff;
   font-family:'Nunito',sans-serif;
-  font-size:.9rem;
+  font-size:1rem;
   outline:none;
   transition:all .25s;
   resize:none;
@@ -1417,18 +1404,18 @@ header {
 .form-group select option { background:#111; }
 .form-group input::placeholder,
 .form-group textarea::placeholder { color:#333; }
-.error-msg { font-size:.73rem; color:#E63946; font-weight:800; margin-top:4px; }
+.error-msg { font-size:.8rem; color:#E63946; font-weight:800; margin-top:5px; }
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.form-actions { padding:0 18px 18px; display:flex; gap:8px; flex-wrap:wrap; }
+.form-actions { padding:0 20px 20px; display:flex; gap:8px; flex-wrap:wrap; }
 .btn-back {
   flex:1;
   background:transparent;
   border:2px solid #222;
   border-radius:10px;
-  padding:11px 8px;
+  padding:13px 8px;
   color:#666;
   font-family:'Anton',cursive;
-  font-size:.85rem;
+  font-size:.92rem;
   letter-spacing:1px;
   cursor:pointer;
   transition:all .2s;
@@ -1441,10 +1428,10 @@ header {
   background:#FF6B00;
   border:none;
   border-radius:10px;
-  padding:11px 8px;
+  padding:13px 8px;
   color:#fff;
   font-family:'Anton',cursive;
-  font-size:.88rem;
+  font-size:.95rem;
   letter-spacing:1px;
   cursor:pointer;
   transition:all .2s;
@@ -1459,10 +1446,10 @@ header {
   background:transparent;
   border:2px solid #FFE600;
   border-radius:10px;
-  padding:11px 8px;
+  padding:13px 8px;
   color:#FFE600;
   font-family:'Anton',cursive;
-  font-size:.82rem;
+  font-size:.9rem;
   letter-spacing:1px;
   cursor:pointer;
   transition:all .2s;
@@ -1472,24 +1459,24 @@ header {
 }
 .btn-download:hover { background:#FFE600; color:#000; }
 
-/* ══ FACTURA NEGRO/NARANJA — LETRAS MÁS GRANDES ══ */
+/* ══ FACTURA ══ */
 .invoice-wrap { padding:0 16px 16px; }
 .inv-head-bar { padding:16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:2px solid #FFE600; background:#000; position:sticky; top:0; z-index:2; }
 
 .invoice { background:#0a0a0a; color:#fff; border-radius:8px; overflow:hidden; margin-top:16px; border:1px solid #FF6B00; }
 .inv-top { background:#FF6B00; padding:16px 18px; text-align:center; border-bottom:3px solid #FFE000; }
 .inv-logo-text { font-family:'Permanent Marker',cursive; font-size:clamp(1.3rem, 5vw, 2rem); color:#fff; letter-spacing:2px; }
-.inv-sub { font-size:.82rem; color:rgba(255,255,255,.9); margin-top:5px; font-weight:700; }
+.inv-sub { font-size:.88rem; color:rgba(255,255,255,.9); margin-top:5px; font-weight:700; }
 
 .inv-meta { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:#FF6B00; border-bottom:1px solid #FF6B00; }
-.inv-cell { background:#111; padding:11px 14px; }
-.inv-cell label { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; font-weight:800; margin-bottom:4px; }
+.inv-cell { background:#111; padding:12px 14px; }
+.inv-cell label { display:block; font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; font-weight:800; margin-bottom:4px; }
 .inv-cell span { font-size:1rem; font-weight:800; color:#fff; }
 .inv-cell.wide { grid-column:span 2; }
 
 .inv-table-wrap { padding:14px 16px; }
-.inv-table-wrap table { width:100%; border-collapse:collapse; font-size:.92rem; table-layout:fixed; }
-.inv-table-wrap th { text-align:left; padding:8px 5px; border-bottom:2px solid #FF6B00; font-size:.78rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; }
+.inv-table-wrap table { width:100%; border-collapse:collapse; font-size:.95rem; table-layout:fixed; }
+.inv-table-wrap th { text-align:left; padding:8px 5px; border-bottom:2px solid #FF6B00; font-size:.82rem; text-transform:uppercase; letter-spacing:.5px; color:#FF6B00; }
 .inv-table-wrap th:not(:first-child) { text-align:center; }
 .inv-table-wrap th:last-child { text-align:right; }
 .inv-table-wrap th:first-child { width:45%; }
@@ -1501,12 +1488,12 @@ header {
 .inv-table-wrap td:last-child { text-align:right; font-weight:800; color:#FF6B00; }
 
 .inv-totals { background:#0d0d0d; padding:12px 16px; border-top:1px solid #FF6B00; }
-.inv-tot { display:flex; justify-content:space-between; font-size:.95rem; color:#999; padding:5px 0; font-weight:700; }
-.inv-tot.grand { border-top:2px solid #FF6B00; margin-top:8px; padding-top:8px; font-size:clamp(1.05rem, 3.5vw, 1.3rem); font-weight:900; color:#fff; }
+.inv-tot { display:flex; justify-content:space-between; font-size:1rem; color:#999; padding:5px 0; font-weight:700; }
+.inv-tot.grand { border-top:2px solid #FF6B00; margin-top:8px; padding-top:8px; font-size:clamp(1.1rem, 3.5vw, 1.3rem); font-weight:900; color:#fff; }
 .inv-tot.grand span:last-child { color:#FF6B00; }
 .inv-gratis { color:#00e676; }
 .inv-cambio { color:#00e676; margin-top:4px; font-size:1rem; }
-.inv-foot-note { background:#FF6B00; color:#fff; text-align:center; padding:12px; font-size:.8rem; font-family:'Anton',cursive; letter-spacing:2px; }
+.inv-foot-note { background:#FF6B00; color:#fff; text-align:center; padding:12px; font-size:.85rem; font-family:'Anton',cursive; letter-spacing:2px; }
 
 /* ══ HISTORIAL ══ */
 .history-modal {
@@ -1522,16 +1509,16 @@ header {
   animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
 }
 .history-body { flex:1; overflow-y:auto; padding:12px 16px; scrollbar-width:thin; scrollbar-color:#FFE600 transparent; }
-.history-item { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:12px; margin-bottom:10px; }
+.history-item { background:#111; border:1px solid #1e1e1e; border-radius:8px; padding:13px; margin-bottom:10px; }
 .history-item-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:6px; gap:6px; flex-wrap:wrap; }
-.history-num { font-family:'Anton',cursive; font-size:.88rem; letter-spacing:2px; color:#FFE600; margin-right:8px; }
-.history-date { font-size:.75rem; color:#555; font-weight:700; }
-.history-total { font-family:'Anton',cursive; font-size:1rem; color:#FF6B00; }
-.history-client { font-size:.78rem; color:#777; margin-bottom:6px; font-weight:700; }
+.history-num { font-family:'Anton',cursive; font-size:.96rem; letter-spacing:2px; color:#FFE600; margin-right:8px; }
+.history-date { font-size:.82rem; color:#555; font-weight:700; }
+.history-total { font-family:'Anton',cursive; font-size:1.05rem; color:#FF6B00; }
+.history-client { font-size:.85rem; color:#777; margin-bottom:6px; font-weight:700; }
 .history-products { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
-.h-prod-chip { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:20px; padding:2px 8px; font-size:.7rem; color:#aaa; font-weight:700; }
-.h-tag { background:#1a1a1a; border:1px solid #333; border-radius:4px; padding:2px 7px; font-size:.68rem; color:#666; font-weight:800; font-family:'Anton',cursive; letter-spacing:1px; }
-.btn-history-pdf { background:transparent; border:1.5px solid #FFE600; border-radius:5px; padding:3px 8px; color:#FFE600; font-family:'Anton',cursive; font-size:.68rem; letter-spacing:1px; cursor:pointer; transition:all .2s; }
+.h-prod-chip { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:20px; padding:3px 10px; font-size:.76rem; color:#aaa; font-weight:700; }
+.h-tag { background:#1a1a1a; border:1px solid #333; border-radius:4px; padding:3px 8px; font-size:.76rem; color:#666; font-weight:800; font-family:'Anton',cursive; letter-spacing:1px; }
+.btn-history-pdf { background:transparent; border:1.5px solid #FFE600; border-radius:5px; padding:4px 9px; color:#FFE600; font-family:'Anton',cursive; font-size:.74rem; letter-spacing:1px; cursor:pointer; transition:all .2s; }
 .btn-history-pdf:hover { background:#FFE600; color:#000; }
 
 /* ══ PANEL ADMIN ══ */
@@ -1566,11 +1553,11 @@ header {
   background:#000;
   color:#FFE600;
   font-family:'Anton',cursive;
-  font-size:.88rem;
+  font-size:.95rem;
   letter-spacing:1px;
   border-radius:50%;
-  width:28px;
-  height:28px;
+  width:30px;
+  height:30px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1603,7 +1590,7 @@ header {
 
 /* ══ NOTIFICACIONES ══ */
 .notifs { position:fixed; top:74px; right:10px; z-index:999; display:flex; flex-direction:column; gap:6px; pointer-events:none; max-width:calc(100vw - 20px); }
-.notif { background:#0d0d0d; border-left:4px solid #FFE600; border-radius:8px; padding:9px 13px; font-family:'Nunito',sans-serif; font-weight:800; font-size:.82rem; display:flex; align-items:center; gap:7px; min-width:180px; max-width:280px; color:#fff; box-shadow:0 4px 16px rgba(0,0,0,.8); pointer-events:all; animation:nIn .35s cubic-bezier(.34,1.56,.64,1); }
+.notif { background:#0d0d0d; border-left:4px solid #FFE600; border-radius:8px; padding:10px 14px; font-family:'Nunito',sans-serif; font-weight:800; font-size:.9rem; display:flex; align-items:center; gap:7px; min-width:190px; max-width:290px; color:#fff; box-shadow:0 4px 16px rgba(0,0,0,.8); pointer-events:all; animation:nIn .35s cubic-bezier(.34,1.56,.64,1); }
 .notif.success { border-left-color:#00e676; }
 .notif.error   { border-left-color:#E63946; }
 .notif.info    { border-left-color:#FF6B00; }
@@ -1613,7 +1600,7 @@ header {
 .success-box { padding:32px 20px; text-align:center; }
 .success-big { font-size:4rem; margin-bottom:14px; animation:popIn .5s ease; }
 .success-box h2 { font-family:'Anton',cursive; font-size:clamp(1.4rem, 5vw, 2rem); letter-spacing:3px; color:#00e676; margin-bottom:8px; text-transform:uppercase; }
-.success-box p { color:#666; font-size:.9rem; margin-bottom:8px; }
+.success-box p { color:#666; font-size:.95rem; margin-bottom:8px; }
 .order-num { border:2px solid #FFE600; border-radius:8px; padding:10px 16px; font-family:'Anton',cursive; font-size:clamp(1.2rem, 4vw, 1.6rem); letter-spacing:3px; color:#FFE600; margin:14px auto; display:inline-block; }
 
 /* ══ SIN RESULTADOS ══ */
@@ -1623,7 +1610,7 @@ header {
 /* ══ FOOTER ══ */
 footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-align:center; }
 .footer-logo { font-family:'Permanent Marker',cursive; font-size:clamp(1.1rem, 4vw, 1.6rem); background:linear-gradient(180deg,#FFD700 0%,#FF6B00 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; }
-.footer-info { color:#444; font-size:.78rem; font-weight:700; }
+.footer-info { color:#444; font-size:.85rem; font-weight:700; }
 
 /* ══ TRANSICIONES ══ */
 .fade-enter-active,.fade-leave-active { transition:opacity .2s; }
@@ -1649,7 +1636,7 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
   .product-grid { grid-template-columns:repeat(3, 1fr); gap:14px; }
   .card-name { font-size:.95rem; }
   .price { font-size:1.25rem; }
-  .add-btn { width:34px; height:34px; }
+  .add-btn { width:36px; height:36px; }
   .cart-fab { bottom:28px; right:24px; }
 }
 
@@ -1663,30 +1650,31 @@ footer { background:#000; border-top:3px solid #FFE600; padding:22px 16px; text-
   .products-wrap { padding:32px 24px 120px; }
 }
 
+/* ══ PANTALLAS MUY PEQUEÑAS — menos agresivo con la reducción ══ */
 @media(max-width:360px){
   .header-inner { gap:5px; padding:0 8px; }
-  .menu-icon { font-size:1.2rem; }
+  .menu-icon { font-size:1.3rem; }
   .logo-text { font-size:1.1rem; }
-  .cart-btn { padding:5px 8px; font-size:.75rem; }
-  .history-btn { padding:5px 7px; }
+  .cart-btn { padding:6px 8px; font-size:.82rem; }
+  .history-btn { padding:6px 8px; }
   .product-grid { grid-template-columns:repeat(2, 1fr); gap:8px; }
-  .card-body { padding:6px 8px 8px; }
-  .card-name { font-size:.72rem; }
-  .card-desc { font-size:.62rem; min-height:24px; }
-  .price { font-size:.92rem; }
-  .add-btn { width:28px; height:28px; font-size:1.1rem; }
-  .qty-btn { width:22px; height:22px; font-size:.8rem; }
-  .qty-num { font-size:.8rem; min-width:14px; }
-  .promo-tag { font-size:.6rem; padding:4px 8px; }
-  .cat-chip { padding:10px 10px; font-size:.68rem; }
-  .sec-title { font-size:1.1rem; }
+  .card-body { padding:7px 8px 10px; }
+  .card-name { font-size:.82rem; }
+  .card-desc { font-size:.74rem; min-height:28px; }
+  .price { font-size:1rem; }
+  .add-btn { width:32px; height:32px; font-size:1.2rem; }
+  .qty-btn { width:26px; height:26px; font-size:.9rem; }
+  .qty-num { font-size:.88rem; min-width:16px; }
+  .promo-tag { font-size:.72rem; padding:5px 9px; }
+  .cat-chip { padding:11px 11px; font-size:.78rem; }
+  .sec-title { font-size:1.15rem; }
   .form-row { grid-template-columns:1fr; }
   .checkout-modal { border-radius:10px; }
-  .form-body { padding:12px 14px; }
+  .form-body { padding:13px 14px; }
   .form-actions { padding:0 14px 14px; gap:6px; }
-  .btn-back, .btn-confirm, .btn-download { font-size:.78rem; padding:10px 6px; }
-  .inv-table-wrap table { font-size:.78rem; }
-  .inv-cell { padding:8px 10px; }
+  .btn-back, .btn-confirm, .btn-download { font-size:.88rem; padding:11px 6px; }
+  .inv-table-wrap table { font-size:.85rem; }
+  .inv-cell { padding:9px 10px; }
   .cart-fab { bottom:16px; right:12px; padding:12px 14px; }
   .cart-fab-total { display:none; }
 }
